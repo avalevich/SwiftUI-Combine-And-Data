@@ -14,11 +14,10 @@ struct ContentView: View {
             ZStack(alignment: .top) {
                 TrackableScrollView(offsetChanged: { offset in
                     contentOffset = offset.y
-                    print(contentOffset)
                 }, content: {
                     content
                 })
-                VisualEffectBlur(blurStyle: .systemMaterial)
+                Color.clear.background(.regularMaterial)
                     .opacity(contentOffset < -16 ? 1 : 0)
                     .animation(.easeIn, value: contentOffset < -16 ? 1: 0)
                     .ignoresSafeArea()
@@ -50,7 +49,7 @@ struct ContentView: View {
             }
             .padding(16)
             .background(Color("Background 1"))
-            .background(VisualEffectBlur(blurStyle: .systemUltraThinMaterialDark))
+            .background(MaterialView(blurEffect: .systemUltraThinMaterialDark))
             .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(Color.white, lineWidth: 1).blendMode(.overlay))
             .mask(RoundedRectangle(cornerRadius: 20, style: .continuous))
             .padding(.top, 20)
@@ -71,6 +70,36 @@ struct ContentView: View {
     var divider: some View {
         Divider()
             .background(Color.white.blendMode(.overlay))
+    }
+}
+
+struct MaterialView: UIViewRepresentable {
+    let material: UIBlurEffect.Style
+    let vibrancyStyle: UIVibrancyEffectStyle?
+    
+    init(blurEffect: UIBlurEffect.Style, vibrancyStyle: UIVibrancyEffectStyle? = nil) {
+        self.material = blurEffect
+        self.vibrancyStyle = vibrancyStyle
+    }
+
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        let blurEffect = UIBlurEffect(style: material)
+        let visualView = UIVisualEffectView(effect: blurEffect)
+        if let vibrancyStyle = vibrancyStyle {
+            visualView.effect = UIVibrancyEffect(blurEffect: blurEffect, style: vibrancyStyle)
+        } else {
+            visualView.effect = blurEffect
+        }
+        return visualView
+    }
+
+    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
+        let blurEffect = UIBlurEffect(style: material)
+        if let vibrancyStyle = vibrancyStyle {
+            uiView.effect = UIVibrancyEffect(blurEffect: blurEffect, style: vibrancyStyle)
+        } else {
+            uiView.effect = blurEffect
+        }
     }
 }
 
